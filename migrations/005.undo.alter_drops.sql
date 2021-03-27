@@ -1,0 +1,2 @@
+ALTER TABLE drops
+DROP COLUMN IF EXISTS lootbox_id;
