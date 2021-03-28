@@ -82,9 +82,9 @@ dropsRouter
         }
 
         //connect to the service to get the data
-        DrospService.getDropById(
+        DropsService.getDropById(
                 req.app.get('db'),
-                req.params.drops_id
+                req.params.drop_id
             )
             .then(drop => {
                 if (!drop) {

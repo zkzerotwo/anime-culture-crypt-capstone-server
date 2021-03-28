@@ -10,6 +10,8 @@ const errorHandler = require('./middleware/error-handler')
 const usersRouter = require('./users/users-router')
 const authRouter = require("./auth/auth-router");
 const pancakeRouter = require('./pancake/pancake-router')
+const lootboxesRouter = require('./lootboxes/lootboxes-router')
+const dropsRouter = require('./drops/drops-router')
 
 const app = express()
 
@@ -30,6 +32,10 @@ app.use('/api/pancakes', pancakeRouter)
 app.use("/api/auth", authRouter);
 //Load user registration router
 app.use("/api/users", usersRouter);
+//Load lootbox router
+app.use("/api/lootboxes", lootboxesRouter)
+//Load drop router
+app.use("/api/drops", dropsRouter)
 app.use(errorHandler)
 
 module.exports = app
