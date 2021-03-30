@@ -9,8 +9,11 @@ const jsonParser = express.json()
 //filter out the response to avoid showing broken data
 const serializeDrops = drop => ({
     id: drop.id,
-    title: xss(drop.title),
-    completed: drop.completed
+    series: xss(drop.series_id),
+    description: xss(drop.drop_description),
+    lootbox: drop.lootbox_id
+
+    // completed: drop.completed
 })
 
 dropsRouter
@@ -26,17 +29,16 @@ dropsRouter
             })
             .catch(next)
     })
+    
     //relevant
     .post(jsonParser, (req, res, next) => {
 
         //take the input from the user
         const {
-            title,
-            completed = false
+            series_id, drop_description, lootbox_id
         } = req.body
         const newDrop = {
-            title,
-            completed
+            series_id, drop_description, lootbox_id
         }
 
         //validate the input
@@ -53,17 +55,17 @@ dropsRouter
 
         //save the input in the db
         DropsService.insertDrop(
-                req.app.get('db'),
-                newDrop
-            )
+            req.app.get('db'),
+            newDrop
+        )
             .then(drop => {
                 res
-                //display the 201 status code
+                    //display the 201 status code
                     .status(201)
                     //redirect the request to the original url adding the drop id for editing
-                    .location(path.posix.join(req.originalUrl, `/${drops.id}`))
+                    .location(path.posix.join(req.originalUrl, `/${drop.id}`))
                     //return the serialized results
-                    .json(serializeDrop(drop))
+                    .json(serializeDrops(drop))
             })
             .catch(next)
     })
@@ -83,9 +85,9 @@ dropsRouter
 
         //connect to the service to get the data
         DropsService.getDropById(
-                req.app.get('db'),
-                req.params.drop_id
-            )
+            req.app.get('db'),
+            req.params.drop_id
+        )
             .then(drop => {
                 if (!drop) {
                     //if there is an error show it
@@ -103,19 +105,23 @@ dropsRouter
     .get((req, res, next) => {
 
         //get each one of the objects from the results and serialize them
-        res.json(serializeDrop(res.drop))
+        res.json(serializeDrops(res.drop))
     })
     //relevant
     .patch(jsonParser, (req, res, next) => {
 
         //take the input from the user
         const {
-            title,
-            completed
+            id,
+            series_id, 
+            drop_description, 
+            lootbox_id
         } = req.body
         const dropToUpdate = {
-            title,
-            completed
+            id,
+            series_id, 
+            drop_description, 
+            lootbox_id
         }
 
         //validate the input by checking the length of the dropToUpdate object to make sure that we have all the values
@@ -131,23 +137,23 @@ dropsRouter
 
         //save the input in the db
         DropsService.updateDrop(
-                req.app.get('db'),
-                req.params.drop_id,
-                dropToUpdate
-            )
+            req.app.get('db'),
+            req.params.drop_id,
+            dropToUpdate
+        )
             .then(updatedDrop => {
 
                 //get each one of the objects from the results and serialize them
-                res.status(200).json(serializeDrop(updatedDrop))
+                res.status(200).json(serializeDrops(updatedDrop))
             })
             .catch(next)
     })
     //relevant
     .delete((req, res, next) => {
         DropsService.deleteDrop(
-                req.app.get('db'),
-                req.params.drop_id
-            )
+            req.app.get('db'),
+            req.params.drop_id
+        )
             .then(numRowsAffected => {
 
                 //check how many rows are effected to figure out if the delete was successful

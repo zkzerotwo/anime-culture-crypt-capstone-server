@@ -3,20 +3,20 @@ const DropService = {
     getDrops(db) {
         return db
             .select('*')
-            .from('drop')
+            .from('drops')
     },
     getDropById(db, drop_id) {
         return db
             .select('*')
-            .from('drop')
-            .where('drop.id', drop_id)
+            .from('drops')
+            .where('drops.id', drop_id)
             .first()
     },
     //relevant
     insertDrop(db, newDrop) {
         return db
             .insert(newDrop)
-            .into('drop')
+            .into('drops')
             .returning('*')
             .then(rows => {
                 return rows[0]
@@ -24,7 +24,7 @@ const DropService = {
     },
     //relevant
     updateDrop(db, drop_id, newDrop) {
-        return db('drop')
+        return db('drops')
             .update(newDrop, returning = true)
             .where({
                 id: drop_id
@@ -36,7 +36,7 @@ const DropService = {
     },
     //relevant
     deleteDrop(db, drop_id) {
-        return db('drop')
+        return db('drops')
             .delete()
             .where({
                 'id': drop_id

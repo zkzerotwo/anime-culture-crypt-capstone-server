@@ -1,33 +1,41 @@
-const PancakeService = {
+const LootboxesService = {
     //relevant
-    getPancakes(db) {
+    getLootboxes(db) {
         return db
             .select('*')
-            .from('pancake')
+            .from('lootboxes')
     },
-    getPancakeById(db, pancake_id) {
+    getLootboxById(db, lootboxes_id) {
         return db
             .select('*')
-            .from('pancake')
-            .where('pancake.id', pancake_id)
+            .from('lootboxes')
+            .where('lootboxes.id', lootboxes_id)
             .first()
     },
-    //relevant
-    insertPancake(db, newPancake) {
+    getDropsForLootbox(db, lootbox_id) {
+        // console.log(lootbox_id)
         return db
-            .insert(newPancake)
-            .into('pancake')
+        // .join('lootboxes', 'lootboxes.id', '=','drops.lootbox_id')
+        .select('*')
+        .from('drops')
+        .where(lootbox_id, lootbox_id)
+    },
+    //relevant
+    insertLootbox(db, newLootbox) {
+        return db
+            .insert(newLootbox)
+            .into('lootboxes')
             .returning('*')
             .then(rows => {
                 return rows[0]
             })
     },
     //relevant
-    updatePancake(db, pancake_id, newPancake) {
-        return db('pancake')
-            .update(newPancake, returning = true)
+    updateLootbox(db, lootboxes_id, newLootbox) {
+        return db('lootboxes')
+            .update(newLootbox, returning = true)
             .where({
-                id: pancake_id
+                id: lootboxes_id
             })
             .returning('*')
             .then(rows => {
@@ -35,13 +43,13 @@ const PancakeService = {
             })
     },
     //relevant
-    deletePancake(db, pancake_id) {
-        return db('pancake')
+    deleteLootbox(db, lootboxes_id) {
+        return db('lootboxes')
             .delete()
             .where({
-                'id': pancake_id
+                'id': lootboxes_id
             })
     }
 }
 
-module.exports = PancakeService
+module.exports = LootboxesService

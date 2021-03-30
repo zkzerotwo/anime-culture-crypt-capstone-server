@@ -1,7 +1,7 @@
 const path = require('path')
 const express = require('express')
 const xss = require('xss')
-const LootboxService = require('./lootbox-service')
+const LootboxService = require('./lootboxes-service')
 
 const lootboxRouter = express.Router()
 const jsonParser = express.json()
@@ -10,7 +10,18 @@ const jsonParser = express.json()
 const serializeLootbox = lootbox => ({
     id: lootbox.id,
     title: xss(lootbox.title),
-    completed: lootbox.completed
+    description: xss(lootbox.description),
+    owner: lootbox.box_owner
+    // completed: lootbox.completed
+})
+
+const serializeDrops = drop => ({
+    id: drop.id,
+    series: xss(drop.series_id),
+    description: xss(drop.drop_description),
+    lootbox: drop.lootbox_id
+
+    // completed: drop.completed
 })
 
 lootboxRouter
@@ -19,10 +30,10 @@ lootboxRouter
     .get((req, res, next) => {
 
         //connect to the service to get the data
-        LootboxService.getLootboxs(req.app.get('db'))
-            .then(lootboxs => {
+        LootboxService.getLootboxes(req.app.get('db'))
+            .then(lootboxes => {
                 //map the results to get each one of the objects and serialize them
-                res.json(lootboxs.map(serializeLootbox))
+                res.json(lootboxes.map(serializeLootbox))
             })
             .catch(next)
     })
@@ -32,11 +43,13 @@ lootboxRouter
         //take the input from the user
         const {
             title,
-            completed = false
+            description,
+            box_owner
         } = req.body
         const newLootbox = {
             title,
-            completed
+            description,
+            box_owner
         }
 
         //validate the input
@@ -53,12 +66,12 @@ lootboxRouter
 
         //save the input in the db
         LootboxService.insertLootbox(
-                req.app.get('db'),
-                newLootbox
-            )
+            req.app.get('db'),
+            newLootbox
+        )
             .then(lootbox => {
                 res
-                //display the 201 status code
+                    //display the 201 status code
                     .status(201)
                     //redirect the request to the original url adding the lootbox id for editing
                     .location(path.posix.join(req.originalUrl, `/${lootbox.id}`))
@@ -83,9 +96,9 @@ lootboxRouter
 
         //connect to the service to get the data
         LootboxService.getLootboxById(
-                req.app.get('db'),
-                req.params.lootbox_id
-            )
+            req.app.get('db'),
+            req.params.lootbox_id
+        )
             .then(lootbox => {
                 if (!lootbox) {
                     //if there is an error show it
@@ -110,12 +123,16 @@ lootboxRouter
 
         //take the input from the user
         const {
+            id,
             title,
-            completed
+            description,
+            box_owner
         } = req.body
         const lootboxToUpdate = {
+            id,
             title,
-            completed
+            description,
+            box_owner
         }
 
         //validate the input by checking the length of the lootboxToUpdate object to make sure that we have all the values
@@ -131,10 +148,10 @@ lootboxRouter
 
         //save the input in the db
         LootboxService.updateLootbox(
-                req.app.get('db'),
-                req.params.lootbox_id,
-                lootboxToUpdate
-            )
+            req.app.get('db'),
+            req.params.lootbox_id,
+            lootboxToUpdate
+        )
             .then(updatedLootbox => {
 
                 //get each one of the objects from the results and serialize them
@@ -145,9 +162,9 @@ lootboxRouter
     //relevant
     .delete((req, res, next) => {
         LootboxService.deleteLootbox(
-                req.app.get('db'),
-                req.params.lootbox_id
-            )
+            req.app.get('db'),
+            req.params.lootbox_id
+        )
             .then(numRowsAffected => {
 
                 //check how many rows are effected to figure out if the delete was successful
@@ -155,6 +172,46 @@ lootboxRouter
             })
             .catch(next)
     })
+lootboxRouter.route('/:lootbox_id/saved')
+.all((req, res, next) => {
+    if (isNaN(parseInt(req.params.lootbox_id))) {
+        //if there is an error show it
+        return res.status(404).json({
+            error: {
+                message: `Invalid id`
+            }
+        })
+    }
 
+    //connect to the service to get the data
+    LootboxService.getLootboxById(
+        req.app.get('db'),
+        req.params.lootbox_id
+    )
+        .then(lootbox => {
+            if (!lootbox) {
+                //if there is an error show it
+                return res.status(404).json({
+                    error: {
+                        message: `Lootbox doesn't exist`
+                    }
+                })
+            }
+            res.lootbox = lootbox
+            next()
+        })
+        .catch(next)
+})
+    //relevant
+    .get((req, res, next) => {
+        // console.log(req.params)
+        LootboxService.getDropsForLootbox(req.app.get('db'),
+        req.params)
+            .then(drops => {
+                //json each drop returned from the lootbox
+                res.json({drops})
+            })
+            .catch(next)
 
+    })
 module.exports = lootboxRouter
