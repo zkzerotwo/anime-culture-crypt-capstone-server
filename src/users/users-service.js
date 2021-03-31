@@ -53,6 +53,13 @@ const UsersService = {
             .where('id', id)
             .first()
     },
+    getLootboxesByUser(db, id) {
+        console.log(id)
+        return db 
+        .select('*')
+        .from('lootboxes')
+        .where('lootboxes.box_owner', id)
+    }
 }
 
 module.exports = UsersService

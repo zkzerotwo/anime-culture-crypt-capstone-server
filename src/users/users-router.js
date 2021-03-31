@@ -112,4 +112,46 @@ usersRouter
             .catch(next)
     })
 
+usersRouter.route('/:user_id/lootboxes')
+    .all((req, res, next) => {
+        if (isNaN(parseInt(req.params.user_id))) {
+            //if there is an error show it
+            return res.status(404).json({
+                error: {
+                    message: `Invalid id`
+                }
+            })
+        }
+
+        //connect to the service to get the user data
+        UsersService.getById(
+            req.app.get('db'),
+            req.params.user_id
+        )
+            .then(user => {
+                if (!user) {
+                    //if there is an error show it
+                    return res.status(404).json({
+                        error: {
+                            message: `User doesn't exist`
+                        }
+                    })
+                }
+                res.user = user
+                next()
+            })
+            .catch(next)
+    })
+    //find lootboxex with this user id
+    .get((req, res, next) => {
+        // console.log(req.params)
+        UsersService.getLootboxesByUser(req.app.get('db'),
+            req.params.user_id)
+            .then(lootboxes => {
+                //json each lootbox returned from the user
+                res.json({ lootboxes })
+            })
+            .catch(next)
+    })
+
 module.exports = usersRouter
