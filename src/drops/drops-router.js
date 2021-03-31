@@ -9,9 +9,13 @@ const jsonParser = express.json()
 //filter out the response to avoid showing broken data
 const serializeDrops = drop => ({
     id: drop.id,
-    series: xss(drop.series_id),
+    series: xss(drop.mal_id),
     description: xss(drop.drop_description),
-    lootbox: drop.lootbox_id
+    lootbox: drop.lootbox_id,
+    type: drop.drop_type,
+    name: xss(drop.drop_name),
+    url: xss(drop.url),
+    image: xss(drop.image_url)
 
     // completed: drop.completed
 })
@@ -35,10 +39,22 @@ dropsRouter
 
         //take the input from the user
         const {
-            series_id, drop_description, lootbox_id
+            mal_id, 
+            drop_name,
+            drop_type,
+            drop_description, 
+            lootbox_id,
+            url,
+            image_url
         } = req.body
         const newDrop = {
-            series_id, drop_description, lootbox_id
+            mal_id, 
+            drop_name,
+            drop_type,
+            drop_description, 
+            lootbox_id,
+            url,
+            image_url
         }
 
         //validate the input
@@ -113,15 +129,24 @@ dropsRouter
         //take the input from the user
         const {
             id,
-            series_id, 
+            mal_id, 
+            drop_name,
+            drop_type,
             drop_description, 
-            lootbox_id
+            lootbox_id,
+            url,
+            image_url
         } = req.body
         const dropToUpdate = {
             id,
-            series_id, 
+            mal_id, 
+            drop_name,
+            drop_type,
             drop_description, 
-            lootbox_id
+            lootbox_id,
+            url,
+            image_url
+
         }
 
         //validate the input by checking the length of the dropToUpdate object to make sure that we have all the values
