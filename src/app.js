@@ -33,7 +33,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 //Load lootbox router
 app.use("/api/lootboxes", lootboxesRouter)
-//Load drop router
+//Load drop route
 app.use("/api/drops", dropsRouter)
 app.use(errorHandler)
 
