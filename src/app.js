@@ -10,6 +10,7 @@ const authRouter = require("./auth/auth-router");
 const pancakeRouter = require('./pancake/pancake-router')
 const lootboxesRouter = require('./lootboxes/lootboxes-router')
 const dropsRouter = require('./drops/drops-router')
+const validateBearerToken = require('./validate-bearer-token')
 
 const app = express()
 
@@ -24,7 +25,7 @@ app.use(cors())
 app.use(helmet())
 
 app.use(express.static('public'))
-
+// app.use(validateBearerToken)
 app.use('/api/pancakes', pancakeRouter)
 //Load user login router
 app.use("/api/auth", authRouter);
