@@ -1,7 +1,7 @@
 const knex = require('knex')
 const app = require('../src/app');
 const { makeUsersArray, makeMaliciousUser } = require('./users-fixtures')
-const { makeLootboxesObject } = require('./lootboxes.fixtures');
+const { makeLootboxesArray } = require('./lootboxes-fixtures');
 const supertest = require('supertest');
 
 describe('Users endpoints.:', function () {
@@ -32,8 +32,8 @@ describe('Users endpoints.:', function () {
 
         context(`Given there are users in the database`, () => {
             const testUsers = makeUsersArray()
-            const testLootboxes = makeLootboxesObject()
-            beforeEach('insert some users', () => {
+            const testLootboxes = makeLootboxesArray()
+            beforeEach('insert some users and lootboxes', () => {
                 return db
                     .into('users')
                     .insert(testUsers)

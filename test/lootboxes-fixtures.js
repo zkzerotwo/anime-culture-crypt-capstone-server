@@ -1,4 +1,4 @@
-function makeLootboxesObject() {
+function makeLootboxesArray() {
     return [
         {
             id: 1,
@@ -57,6 +57,6 @@ function makeMaliciousLootbox() {
 }
 
 module.exports = {
-    makeLootboxesObject,
+    makeLootboxesArray,
     makeMaliciousLootbox
 }
