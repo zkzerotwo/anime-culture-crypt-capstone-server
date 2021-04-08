@@ -9,13 +9,13 @@ const jsonParser = express.json()
 //filter out the response to avoid showing broken data
 const serializeDrops = drop => ({
     id: drop.id,
-    series: xss(drop.mal_id),
-    description: xss(drop.drop_description),
-    lootbox: drop.lootbox_id,
-    type: drop.drop_type,
-    name: xss(drop.drop_name),
+    mal_id: xss(drop.mal_id),
+    drop_description: xss(drop.drop_description),
+    lootbox_id: drop.lootbox_id,
+    drop_type: drop.drop_type,
+    drop_name: xss(drop.drop_name),
     url: xss(drop.url),
-    image: xss(drop.image_url)
+    image_url: xss(drop.image_url)
 
     // completed: drop.completed
 })

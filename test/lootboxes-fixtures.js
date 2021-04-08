@@ -43,7 +43,7 @@ function makeMaliciousLootbox() {
         id: 911,
         title: 'Naughty naughty very naughty <script>alert("xss");</script>',
         description: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
-        owner: 6
+        box_owner: 6
     }
     const expectedLootbox = {
         ...maliciousLootbox,

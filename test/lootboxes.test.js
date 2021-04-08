@@ -16,9 +16,14 @@ describe('Lootboxes endpoints.:', function () {
         app.set('db', db)
     });
 
+    before('cleanup', () => db.raw('TRUNCATE TABLE lootboxes RESTART IDENTITY CASCADE;'));
+
     before('cleanup', () => db.raw('TRUNCATE TABLE users RESTART IDENTITY CASCADE;'));
 
+    afterEach('cleanup', () => db.raw('TRUNCATE TABLE lootboxes RESTART IDENTITY CASCADE;'));
+
     afterEach('cleanup', () => db.raw('TRUNCATE TABLE users RESTART IDENTITY CASCADE;'));
+
 
     after('disconnect from the database', () => db.destroy());
 
@@ -43,11 +48,11 @@ describe('Lootboxes endpoints.:', function () {
                         return db
                             .into('lootboxes')
                             .insert(testLootboxes)
-                            .then(() => {
-                                return db 
-                                .into('drops')
-                                .insert(testDrops)
-                            })
+                        // .then(() => {
+                        //     return db
+                        //         .into('drops')
+                        //         .insert(testDrops)
+                        // })
                     });
             })
             it('responds with 200 and all of the lootboxes', () => {
@@ -56,6 +61,11 @@ describe('Lootboxes endpoints.:', function () {
                     .expect(200, testLootboxes)
             })
             it('responds with 200 and all lotbox drops', () => {
+                before('insert drops', () => {
+                    return db
+                        .into('drops')
+                        .insert(testDrops)
+                })
                 let doc;
                 return db('lootboxes')
                     .first()
@@ -110,10 +120,12 @@ describe('Lootboxes endpoints.:', function () {
                 })
                 .then(res => {
                     expect(res.body).to.be.an('object');
-                    expect(res.body).to.include.keys('id', 'lotbox_name', 'password');
+                    expect(res.body).to.include.keys('id', 'title', 'description', 'is_public', 'box_owner');
                     expect(res.body.id).to.equal(doc.id);
-                    expect(res.body.lotbox_name).to.equal(doc.lotbox_name);
-                    expect(res.body.password).to.equal(doc.password);
+                    expect(res.body.title).to.equal(doc.title);
+                    expect(res.body.description).to.equal(doc.description);
+                    expect(res.body.box_owner).to.equal(doc.box_owner);
+                    expect(res.body.is_public).to.equal(doc.is_public);
                 });
         });
 
@@ -132,8 +144,10 @@ describe('Lootboxes endpoints.:', function () {
         it('should create and return a new lootboxes when provided valid data', function () {
             const newItem = {
                 id: 1,
-                lotbox_name: "reiner@aot.com",
-                password: "secret",
+                title: "Shojo Classics",
+                description: "Soft titles with a romantic plotline, beautiful characters, and a dramatic climax",
+                is_public: 0,
+                box_owner: 1
             };
             console.log(newItem, "item check")
             return supertest(app)
@@ -143,10 +157,12 @@ describe('Lootboxes endpoints.:', function () {
                 .expect(res => {
                     // console.log(res, "response check")
                     expect(res.body).to.be.a('object');
-                    expect(res.body).to.include.keys('lotbox_name', 'id');
-                    expect(res.body.lotbox_name).to.equal(newItem.lotbox_name);
-                    // expect(res.body.password).to.be.undefined;
-                    // expect(res.headers.location).to.equal(`/api/lootboxes/${res.body.id}`)
+                    expect(res.body).to.include.keys('id', 'title', 'description', 'is_public', 'box_owner');
+                    expect(res.body.id).to.equal(newItem.id);
+                    expect(res.body.title).to.equal(newItem.title);
+                    expect(res.body.description).to.equal(newItem.description);
+                    expect(res.body.box_owner).to.equal(newItem.box_owner);
+                    expect(res.body.is_public).to.equal(newItem.is_public);
                 });
         });
 
@@ -176,7 +192,7 @@ describe('Lootboxes endpoints.:', function () {
     });
 
     describe('DELETE a lootboxes by id', () => {
-const testLootboxes = makeLootboxesArray()
+        const testLootboxes = makeLootboxesArray()
         beforeEach('insert some lootboxes', () => {
             return db('lootboxes').insert(testLootboxes);
         })

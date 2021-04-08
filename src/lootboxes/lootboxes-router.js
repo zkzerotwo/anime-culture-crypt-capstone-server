@@ -11,7 +11,8 @@ const serializeLootbox = lootbox => ({
     id: lootbox.id,
     title: xss(lootbox.title),
     description: xss(lootbox.description),
-    owner: lootbox.box_owner
+    box_owner: lootbox.box_owner,
+    is_public: lootbox.is_public
     // completed: lootbox.completed
 })
 
