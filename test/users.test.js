@@ -129,7 +129,7 @@ describe('Users endpoints.:', function () {
                 user_name: "reiner@aot.com",
                 password: "secret",
             };
-            console.log(newItem, "item check")
+            // console.log(newItem, "item check")
             return supertest(app)
                 .post('/api/users')
                 .send(newItem)

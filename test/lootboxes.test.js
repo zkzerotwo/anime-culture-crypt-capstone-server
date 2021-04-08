@@ -16,11 +16,11 @@ describe('Lootboxes endpoints.:', function () {
         app.set('db', db)
     });
 
-    before('cleanup', () => db.raw('TRUNCATE TABLE lootboxes RESTART IDENTITY CASCADE;'));
+    // before('cleanup', () => db.raw('TRUNCATE TABLE lootboxes RESTART IDENTITY CASCADE;'));
 
     before('cleanup', () => db.raw('TRUNCATE TABLE users RESTART IDENTITY CASCADE;'));
 
-    afterEach('cleanup', () => db.raw('TRUNCATE TABLE lootboxes RESTART IDENTITY CASCADE;'));
+    // afterEach('cleanup', () => db.raw('TRUNCATE TABLE lootboxes RESTART IDENTITY CASCADE;'));
 
     afterEach('cleanup', () => db.raw('TRUNCATE TABLE users RESTART IDENTITY CASCADE;'));
 
@@ -72,8 +72,9 @@ describe('Lootboxes endpoints.:', function () {
                     .then(_doc => {
                         doc = _doc
                         console.log(doc, "doc check")
+                        // console.log(testDrops, "drop check")
                         return supertest(app)
-                            .get(`/api/lootboxes/${doc.id}/drops`)
+                            .get(`/api/lootboxes/${doc.id}/saved`)
                             .expect(200, { drops: testDrops });
                     })
             })

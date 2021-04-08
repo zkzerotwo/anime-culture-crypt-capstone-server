@@ -23,7 +23,7 @@ usersRouter
             password
         } = req.body
 
-        console.log("user_name:", user_name, "password-->", password, '<---');
+        // console.log("user_name:", user_name, "password-->", password, '<---');
 
         for (const field of ['user_name', 'password'])
             if (!req.body[field])
@@ -32,7 +32,7 @@ usersRouter
                 })
         const passwordError = UsersService.validatePassword(password.trim())
 
-        console.log("password error:", passwordError);
+        // console.log("password error:", passwordError);
 
         if (passwordError)
             return res.status(400).json({ error: passwordError })
@@ -43,7 +43,7 @@ usersRouter
         )
             .then(hasUserWithUserName => {
 
-                console.log("hasUserWithUserName:", hasUserWithUserName);
+                // console.log("hasUserWithUserName:", hasUserWithUserName);
 
                 if (hasUserWithUserName)
                     return res.status(400).json({ error: `Username already taken` })
@@ -55,28 +55,28 @@ usersRouter
                             user_name,
                             password: hashedPassword
                         }
-                        console.log(newUser, 'new user payload')
+                        // console.log(newUser, 'new user payload')
                         return UsersService.insertUser(
                             req.app.get('db'),
                             newUser
                         )
                             .then(user => {
-                                console.log("user:", user)
+                                // console.log("user:", user)
                                 res
                                     .status(201)
                                     // .location(path.posix.join(req.originalUrl, `/${user.id}`))
                                     .json(UsersService.serializeUser(user))
                             })
                             .catch(error => {
-                                console.log('insert user', error)
+                                // console.log('insert user', error)
                             })
                     })
                     .catch(error => {
-                        console.log('hash password', error)
+                        // console.log('hash password', error)
                     })
             })
             .catch(error => {
-                console.log('duplicated username', error)
+                // console.log('duplicated username', error)
             })
     })
 
