@@ -76,5 +76,5 @@ function makeMaliciousDrop() {
 }
 module.exports = {
     makeDropsArray,
-    makeMaliciousDrop
+    makeMaliciousDrop,
 }

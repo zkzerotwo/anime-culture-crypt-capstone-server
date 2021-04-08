@@ -1,6 +1,6 @@
 const knex = require('knex')
 const app = require('../src/app');
-const { makeUsersArray } = require('./users.fixtures')
+const { makeUsersArray, makeMaliciousUser } = require('./users-fixtures')
 const { makeLootboxesObject } = require('./lootboxes.fixtures');
 const supertest = require('supertest');
 
@@ -39,195 +39,160 @@ describe('Users endpoints.:', function () {
                     .insert(testUsers)
                     .then(() => {
                         return db
-                        .into('lootboxes')
-                        .insert(testLootboxes)
+                            .into('lootboxes')
+                            .insert(testLootboxes)
                     });
             })
-
+            it('responds with 200 and all of the users', () => {
+                return supertest(app)
+                    .get('/api/users')
+                    .expect(200, testUsers)
+            })
             it('responds with 200 and all user lootboxes', () => {
                 let doc;
                 return db('users')
                     .first()
                     .then(_doc => {
                         doc = _doc
-                        console.log(doc, "doc check")
+                        // console.log(doc, "doc check")
                         return supertest(app)
                             .get(`/api/users/${doc.id}/lootboxes`)
-                            .expect(200,{ lootboxes: testLootboxes});
+                            .expect(200, { lootboxes: testLootboxes });
                     })
             })
+        })
 
-            //relevant
-            it('should respond to GET `/api/users` with an array of users and status 200', function () {
-                return supertest(app)
-                    .get('/api/users')
-                    .expect(200, testUsers)
-                // .expect(res => {
-                //     expect(res.body).to.be.a('array');
-                //     expect(res.body).to.have.length(users.length);
-                //     res.body.forEach((item) => {
-                //         expect(item).to.be.a('object');
-                //         expect(item).to.include.keys('id', 'user_name', 'password');
-                //     });
-                // });
-            });
+        context(`Given an XSS attack user`, () => {
+            const { maliciousUser, expectedUser } = makeMaliciousUser()
 
-        });
-
-
-        describe('GET users by id', () => {
-            const users = makeUsersArray()
-            beforeEach('insert some users', () => {
-                return db('users').insert(users);
+            beforeEach('insert malicious user', () => {
+                return db
+                    .into('users')
+                    .insert([maliciousUser])
             })
 
-            it('should return correct users when given an id', () => {
-                let doc;
-                return db('users')
-                    .first()
-                    .then(_doc => {
-                        doc = _doc
-                        return supertest(app)
-                            .get(`/api/users/${doc.id}`)
-                            .expect(200);
-                    })
-                    .then(res => {
-                        expect(res.body).to.be.an('object');
-                        expect(res.body).to.include.keys('id', 'user_name', 'password');
-                        expect(res.body.id).to.equal(doc.id);
-                        expect(res.body.user_name).to.equal(doc.user_name);
-                        expect(res.body.password).to.equal(doc.password);
-                    });
-            });
-
-            it('should respond with a 404 when given an invalid id', () => {
+            it('removes XSS attack content', () => {
                 return supertest(app)
-                    .get('/api/users/8')
-                    .expect(404);
-            });
-
-        });
-
-
-        describe('POST (create) new users', function () {
-
-            //relevant
-            it('should create and return a new users when provided valid data', function () {
-                const newItem = {
-                    id: 1,
-                    user_name: "reiner@aot.com",
-                    password: "secret",
-                };
-                console.log(newItem, "item check")
-                return supertest(app)
-                    .post('/api/users')
-                    .send(newItem)
-                    .expect(201)
+                    .get(`/api/users`)
+                    .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+                    .expect(200)
                     .expect(res => {
-                        console.log(res, "response check")
-                        expect(res.body).to.be.a('object');
-                        expect(res.body).to.include.keys('user_name', 'id');
-                        expect(res.body.user_name).to.equal(newItem.user_name);
-                        // expect(res.body.password).to.be.undefined;
-                        // expect(res.headers.location).to.equal(`/api/users/${res.body.id}`)
-                    });
-            });
+                        expect(res.body[0].title).to.eql(expectedUser.title)
+                        expect(res.body[0].description).to.eql(expectedUser.description)
+                    })
+            })
+        })
 
-            it('should respond with 400 status when given bad data', function () {
-                const badItem = {
-                    foobar: 'broken item'
-                };
-                return supertest(app)
-                    .post('/api/users')
-                    .send(badItem)
-                    .expect(400);
-            });
+    });
 
+
+    describe('GET users by id', () => {
+        const users = makeUsersArray()
+        beforeEach('insert some users', () => {
+            return db('users').insert(users);
+        })
+
+        it('should return correct users when given an id', () => {
+            let doc;
+            return db('users')
+                .first()
+                .then(_doc => {
+                    doc = _doc
+                    return supertest(app)
+                        .get(`/api/users/${doc.id}`)
+                        .expect(200);
+                })
+                .then(res => {
+                    expect(res.body).to.be.an('object');
+                    expect(res.body).to.include.keys('id', 'user_name', 'password');
+                    expect(res.body.id).to.equal(doc.id);
+                    expect(res.body.user_name).to.equal(doc.user_name);
+                    expect(res.body.password).to.equal(doc.password);
+                });
         });
 
+        it('should respond with a 404 when given an invalid id', () => {
+            return supertest(app)
+                .get('/api/users/8')
+                .expect(404);
+        });
 
-        describe('PATCH (update) users by id', () => {
+    });
+
+
+    describe('POST (create) new users', function () {
+
+        //relevant
+        it('should create and return a new users when provided valid data', function () {
+            const newItem = {
+                id: 1,
+                user_name: "reiner@aot.com",
+                password: "secret",
+            };
+            console.log(newItem, "item check")
+            return supertest(app)
+                .post('/api/users')
+                .send(newItem)
+                .expect(201)
+                .expect(res => {
+                    // console.log(res, "response check")
+                    expect(res.body).to.be.a('object');
+                    expect(res.body).to.include.keys('user_name', 'id');
+                    expect(res.body.user_name).to.equal(newItem.user_name);
+                    // expect(res.body.password).to.be.undefined;
+                    // expect(res.headers.location).to.equal(`/api/users/${res.body.id}`)
+                });
+        });
+
+    });
+
+
+    describe('PATCH (update) users by id', () => {
+        context(`Given no users`, () => {
+            it(`responds with 404`, () => {
+                const userId = 123456
+                return supertest(app)
+                    .patch(`/api/users/${userId}`)
+                    .expect(404, { error: { message: `User doesn't exist.` } })
+            })
+        })
+        context('Given there are users in the database', () => {
             const testUsers = makeUsersArray()
 
             beforeEach('insert some users', () => {
-                return db('users').insert(testUsers);
+                return db
+                    ('users')
+                    .insert(testUsers);
             })
 
             //relevant
-                it('should update item when given valid data and an id', function () {
-                    const idToUpdate = 2
-                    const updateUser = {
-                        user_name: "bojangles",
-                        password: "secret"
-                    };
-                    const expectedUser = {
-                        ...testUsers[idToUpdate - 1],
-                        ...updateUser
-                    }
+        })
+    });
+
+    describe('DELETE a users by id', () => {
+const testUsers = makeUsersArray()
+        beforeEach('insert some users', () => {
+            return db('users').insert(testUsers);
+        })
+
+        //relevant
+        it('should delete an item by id', () => {
+            return db('users')
+                .first()
+                .then(doc => {
                     return supertest(app)
-                        .patch(`/api/users/${idToUpdate}`)
-                        .send(item)
-                        .expect(200);
+                        .delete(`/api/users/${doc.id}`)
+                        .expect(204);
                 })
-                    // .then(res => {
-                    //     console.log(res.body, "second res check")
-                    //     expect(res.body).to.be.a('object');
-                    //     expect(res.body).to.include.keys('id', 'user_name', 'password');
-                    //     expect(res.body.user_name).to.equal(item.user_name);
-                    //     expect(res.body.password).to.be.true;
-                    // });
-            });
-
-            it('should respond with 400 status when given bad data', function () {
-                const badItem = {
-                    id: 69696969696
-                };
-
-                return db('users')
-                    .first()
-                    .then(doc => {
-                        return supertest(app)
-                            .patch(`/api/users/${doc.id}`)
-                            .send(badItem)
-                            .expect(400);
-                    })
-            });
-
-            it('should respond with a 404 for an invalid id', () => {
-                const item = {
-                    'user_name': 'Buy New Dishes'
-                };
-                return supertest(app)
-                    .patch('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa')
-                    .send(item)
-                    .expect(404);
-            });
-
         });
 
-
-        describe('DELETE a users by id', () => {
-
-            beforeEach('insert some users', () => {
-                return db('users').insert(users);
-            })
-
-            //relevant
-            it('should delete an item by id', () => {
-                return db('users')
-                    .first()
-                    .then(doc => {
-                        return supertest(app)
-                            .delete(`/api/users/${doc.id}`)
-                            .expect(204);
-                    })
-            });
-
-            it('should respond with a 404 for an invalid id', function () {
-                return supertest(app)
-                    .delete('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa')
-                    .expect(404);
-            });
+        it('should respond with a 404 for an invalid id', function () {
+            return supertest(app)
+                .delete('/api/users/3')
+                .expect(404);
         });
     });
-// });
+});
+
+
+
