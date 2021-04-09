@@ -74,11 +74,11 @@ describe('Users endpoints.:', function () {
             it('removes XSS attack content', () => {
                 return supertest(app)
                     .get(`/api/users`)
-                    .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+                    // .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                     .expect(200)
                     .expect(res => {
-                        expect(res.body[0].title).to.eql(expectedUser.title)
-                        expect(res.body[0].description).to.eql(expectedUser.description)
+                        expect(res.body[0].user_name).to.eql(expectedUser.user_name)
+                        expect(res.body[0].password).to.eql(expectedUser.password)
                     })
             })
         })

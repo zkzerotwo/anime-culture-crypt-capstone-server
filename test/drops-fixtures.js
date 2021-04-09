@@ -2,7 +2,7 @@ function makeDropsArray() {
     return [
         {
             id: 1,
-            mal_id: "6969",
+            mal_id: 6969,
             drop_description: "A lovely advnture of two lovers star crossed through time.",
             lootbox_id: 1,
             drop_type: "manga",
@@ -12,7 +12,7 @@ function makeDropsArray() {
         },
         {
             id: 2,
-            mal_id: "6969",
+            mal_id: 6969,
             drop_description: "A lovely advnture of two lovers star crossed through time.",
             lootbox_id: 1,
             drop_type: "manga",
@@ -22,7 +22,7 @@ function makeDropsArray() {
         },
         {
             id: 3,
-            mal_id: "6969",
+            mal_id: 6969,
             drop_description: "A lovely advnture of two lovers star crossed through time.",
             lootbox_id: 1,
             drop_type: "manga",
@@ -32,7 +32,7 @@ function makeDropsArray() {
         },
         {
             id: 4,
-            mal_id: "6969",
+            mal_id: 6969,
             drop_description: "A lovely advnture of two lovers star crossed through time.",
             lootbox_id: 1,
             drop_type: "manga",
@@ -42,7 +42,7 @@ function makeDropsArray() {
         },
         {
             id: 5,
-            mal_id: "6969",
+            mal_id: 6969,
             drop_description: "A lovely advnture of two lovers star crossed through time.",
             lootbox_id: 1,
             drop_type: "manga",
@@ -56,7 +56,7 @@ function makeDropsArray() {
 function makeMaliciousDrop() {
     const maliciousDrop = {
         id: 5,
-        mal_id: "6969",
+        mal_id: 6969,
         drop_description: 'Naughty naughty very naughty <script>alert("xss");</script>',
         lootbox_id: 1,
         drop_type: "manga",

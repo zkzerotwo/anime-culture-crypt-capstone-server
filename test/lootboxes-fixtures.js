@@ -41,9 +41,10 @@ function makeLootboxesArray() {
 function makeMaliciousLootbox() {
     const maliciousLootbox = {
         id: 911,
+        is_public: 0,
         title: 'Naughty naughty very naughty <script>alert("xss");</script>',
         description: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
-        box_owner: 6
+        box_owner: 1
     }
     const expectedLootbox = {
         ...maliciousLootbox,
