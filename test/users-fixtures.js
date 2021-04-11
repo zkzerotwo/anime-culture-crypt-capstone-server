@@ -13,6 +13,14 @@ function makeUsersArray() {
   ]
 }
 
+function userRegObject() {
+  return {
+    id: 1,
+    user_name: 'sam.gamgee@shire.com',
+    password: 'secret'
+  }
+}
+
 function makeMaliciousUser() {
   const maliciousUser = {
     id: 5,
@@ -31,5 +39,6 @@ function makeMaliciousUser() {
 }
 module.exports = {
   makeUsersArray,
+  userRegObject,
   makeMaliciousUser
 }

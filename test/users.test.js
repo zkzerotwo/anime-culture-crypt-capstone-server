@@ -139,8 +139,6 @@ describe('Users endpoints.:', function () {
                     expect(res.body).to.be.a('object');
                     expect(res.body).to.include.keys('user_name', 'id');
                     expect(res.body.user_name).to.equal(newItem.user_name);
-                    // expect(res.body.password).to.be.undefined;
-                    // expect(res.headers.location).to.equal(`/api/users/${res.body.id}`)
                 });
         });
 
