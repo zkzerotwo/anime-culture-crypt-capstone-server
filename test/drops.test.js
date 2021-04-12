@@ -48,11 +48,6 @@ describe('Drops endpoints.:', function () {
                         return db
                             .into('drops')
                             .insert(testDrops)
-                        // .then(() => {
-                        //     return db
-                        //         .into('drops')
-                        //         .insert(testDrops)
-                        // })
                     });
             })
             it('responds with 200 and all of the drops', () => {
@@ -125,7 +120,11 @@ describe('Drops endpoints.:', function () {
                 })
                 .then(res => {
                     expect(res.body).to.be.an('object');
-                    expect(res.body).to.include.keys('id', 'title', 'description', 'is_public', 'box_owner');
+                    expect(res.body).to.include.keys('id', 
+                    'mal_id',
+                    'drop_description',
+                    'lootbox_id', 
+                    'drop_type', 'drop_name' ,'url', 'image_url');
                     expect(res.body.id).to.equal(doc.id);
                     expect(res.body.mal_id).to.equal(doc.mal_id);
                     expect(res.body.drop_name).to.equal(doc.drop_name);
@@ -149,11 +148,14 @@ describe('Drops endpoints.:', function () {
         //relevant
         it('should create and return a new drops when provided valid data', function () {
             const newItem = {
-                // id: 1,
-                title: "Shojo Classics",
-                description: "Soft titles with a romantic plotline, beautiful characters, and a dramatic climax",
-                // is_public: 0,
-                box_owner: 1
+                id: 2,
+            mal_id: 6969,
+            drop_description: "A lovely advnture of two lovers star crossed through time.",
+            lootbox_id: 1,
+            drop_type: "manga",
+            drop_name: "Naruto 2: Electric Boogaloo",
+            url: "https://myanimelist.net/manga/42/Dragon_Ball",
+            image_url: "https://cdn.myanimelist.net/images/manga/2/54545.jpg"
             };
             console.log(newItem, "item check")
             return supertest(app)
@@ -165,16 +167,19 @@ describe('Drops endpoints.:', function () {
                         , "response check")
                     expect(res.body).to.be.a('object');
                     expect(res.body).to.include.keys(
-                        // 'id', 
-                        'title',
-                        'description',
-                        // 'is_public', 
-                        'box_owner');
-                    // expect(res.body.id).to.equal(newItem.id);
-                    expect(res.body.title).to.equal(newItem.title);
-                    expect(res.body.description).to.equal(newItem.description);
-                    expect(res.body.box_owner).to.equal(newItem.box_owner);
-                    // expect(res.body.is_public).to.equal(newItem.is_public);
+                        'id', 
+                        'mal_id',
+                        'drop_description',
+                        'lootbox_id', 
+                        'drop_type', 'drop_name' ,'url', 'image_url');
+                    expect(res.body.id).to.equal(newItem.id);
+                    expect(res.body.mal_id).to.equal(newItem.mal_id);
+                    expect(res.body.drop_description).to.equal(newItem.drop_description);
+                    expect(res.body.lootbox_id).to.equal(newItem.lootbox_id);
+                    expect(res.body.drop_type).to.equal(newItem.drop_type),
+                    expect(res.body.drop_name).to.equal(newItem.drop_name);
+                    expect(res.body.url).to.equal(newItem.url);
+                    expect(res.body.image_url).to.equal(newItem.image_url);
                 })
                 .then(res =>
                     // console.log(res.body, "response check")
@@ -208,10 +213,10 @@ describe('Drops endpoints.:', function () {
             it('responds with 204 and updates the lootbox', () => {
                 const idToUpdate = 2
                 const updateDrop = {
-                    title: 'updated lootbox title',
-                    // url: 'https://updated-url.com',
-                    description: 'updated lootbox description',
-                    box_owner: 1,
+                    mal_id: 'updated lootbox title',
+                    url: 'https://updated-url.com',
+                    drop_description: 'updated lootbox description',
+                    lootbox_id: 1,
                 }
                 const expectedDrop = {
                     ...testDrops[idToUpdate - 1],
@@ -219,13 +224,11 @@ describe('Drops endpoints.:', function () {
                 }
                 return supertest(app)
                     .patch(`/api/drops/${idToUpdate}`)
-                    // .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                     .send(updateDrop)
                     .expect(204)
                     .then(res =>
                         supertest(app)
                             .get(`/api/drops/${idToUpdate}`)
-                            // .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                             .expect(expectedDrop)
                     )
             })
