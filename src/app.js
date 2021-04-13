@@ -24,6 +24,7 @@ app.use(cors())
 app.use(helmet())
 
 app.use(express.static('public'))
+app.use()
 // app.use(validateBearerToken)
 //Load user login router
 app.use("/api/auth", authRouter);
